@@ -5,8 +5,6 @@
 创建：
 
 ```plaintext
-VersionSystem\VersionSystemRules.md
-B--0--0.1--_indev--2025*1*1 Version:
 在 “plugins” 下创建一个文件夹
 必须包含：
     1.config.json
@@ -14,6 +12,7 @@ B--0--0.1--_indev--2025*1*1 Version:
     3.自己的版本日志文件
     4.图标文件路径（建议为64X64或32X32的大小）
     5.描述信息的Markdown文件路径
+    6.AithonEditorPlugin
 
 config.json 文件格式：
 {
@@ -28,7 +27,9 @@ config.json 文件格式：
     日志
 版本 Version:
     日志
-版本请参考VersionSystem/VersionSystemRules.md
+AithonEditorPlugin 文件格式：
+1376046_1421686_1434237_1420545_1428532_1427391_1380610_1415981_1421686_1434237_1428532_1431955_1393161_1425109_1435378_1419404_1421686_1427391_
+版本请参考codes/VersionSystem/VersionSystemRules.md
 
 ```
 
