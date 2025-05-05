@@ -64,3 +64,5 @@ B--0--0.1--_indev--2025*4*1 version:
     Catalog structure optimizationed
     Changed the name to aithon
     Changed the suffix to. ait
+B--0--0.1--_indev--2025*5*1 Version:
+    The runner used bytecode format that does not rely on cython (approximatelied)

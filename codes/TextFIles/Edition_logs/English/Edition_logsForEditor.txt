@@ -40,8 +40,13 @@ B--0--0.1--_indev--2025*2*5 Version:
     Added Start Screen
     Added in app icons
     Deleted Help
-B--0--0.1--_indev--2025*4*1 version:
+B--0--0.1--_indev--2025*4*1 Version:
     About, about us, all plugins, installed plugin interface updated
     Modifyed studio logo
     Added GIF animation to the start interface
     Updated plugin (BREAKING CHANGE)
+B--0--0.1--_indev--2025*5*1 Version:
+    plugin updated (BREAKING CHANGE)
+    Removed GIF animation from the start interface
+    Abandoning ImportPlugin API (temporary) Reason: Due to the modification of the import method of the plugin, it was abandoned (the author does not want to change it anymore)
+    The plugin development document was temporarily abandoned
