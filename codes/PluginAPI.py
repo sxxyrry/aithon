@@ -1,7 +1,8 @@
 from .custom.liner import Liner
 import tkinter as tk, tkintertools as tkt, pathlib, json, yaml # type: ignore
 from tkinter import filedialog, messagebox, scrolledtext # type: ignore
-from .Runner import Runner # type: ignore
+# from .Runner import Runner # type: ignore
+from .ImportRunner_pyc import Runner
 from typing import Any, Literal, NoReturn # type: ignore
 import tkinter.ttk as ttk # type: ignore
 import _tkinter as _tk # type: ignore
@@ -34,6 +35,28 @@ import os
 import sys # type: ignore
 from colorama import Fore, Style, init # type: ignore
 from .custom.CustomNotebook import CustomNotebook
+from .PluginBaseClass import PluginModifyTextBaseClass, PluginNormalBaseClass # type: ignore
+
+# from abc import ABCMeta, abstractmethod
+# from typing import Any
+
+# class PluginBaseClass(type, metaclass=ABCMeta):
+#     Register: dict[str, Any] = {}
+
+#     def __new__(cls, name: str, bases: tuple[Any], attrs: dict[str, Any] | None) -> Any:
+#         # 检查子类是否实现了 UsePlugin 方法
+#         if attrs is None:
+#             attrs = {}
+#         if 'UsePlugin' not in attrs:
+#             raise TypeError(f"Class {name} must implement the 'UsePlugin' method")
+        
+#         PluginBaseClass.Register[name] = cls
+        
+#         return super().__new__(cls, name, bases, attrs)
+
+#     @abstractmethod
+#     def UsePlugin(self) -> Any:
+#         raise NotImplementedError
 
 TextList: list[str] = []
 
@@ -155,6 +178,7 @@ else:
 def ChangeTextList(NewTextList: list[str]):
     global TextList
     TextList = NewTextList
+    return NewTextList
 
 LoadedPluginsList: list[str] = []
 FolderPath = pathlib.Path(os.path.join(pathlib.Path(__file__).parent.resolve(), './plugins/')).resolve()
@@ -235,14 +259,14 @@ def GetEditionLogs_Plugin(plugin_name: str) -> str | NoReturn:
     '''
     if FindPlugin(plugin_name):
         if os.path.isdir(os.path.join(FolderPath, plugin_name)):
-            with open(os.path.join(FolderPath, plugin_name, './config.json'), 'r') as f:
+            with open(os.path.join(FolderPath, plugin_name, './config.json'), 'r', encoding="UTF-8") as f:
                 config: dict[str, str] = yaml.safe_load(f)
 
             EditionLogsFilePath = config['EditionLogsFilePath']
             if EditionLogsFilePath == '':
                 raise ValueError(f'EditionLogsFilePath is empty. ({plugin_name})')
             else:
-                with open(os.path.join(FolderPath, plugin_name, EditionLogsFilePath), 'r') as f:
+                with open(os.path.join(FolderPath, plugin_name, EditionLogsFilePath), 'r', encoding="UTF-8") as f:
                     EditionLogs: str = f.read()
                 return EditionLogs
         else:
@@ -297,7 +321,7 @@ def JudgeVersion_Equal_Plugin(plugin_name: str, Version: str) -> bool:
 
 def ImportPlugin(plugin_name: str, Now_plugin_name: str) -> dict[str, Any] | NoReturn:
     '''
-    导入插件
+    导入插件 - 由于插件的导入方式的修改，所以废弃（作者不想改了）
 
     :param: plugin_name 本插件的名称
     :param: Now_plugin_name 要导入的插件的名称
@@ -305,6 +329,7 @@ def ImportPlugin(plugin_name: str, Now_plugin_name: str) -> dict[str, Any] | NoR
     :return: dict[str, Any] 插件内容
     :return: NoReturn 插件不存在或格式不正确
     '''
+    raise NotImplementedError
     def Load(path: str):
         path = str(pathlib.Path(path).resolve())
         filePath = os.path.join(path, './__init__.py')

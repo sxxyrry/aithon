@@ -13,9 +13,10 @@ import _tkinter as _tk
 from tkinter import filedialog, messagebox, scrolledtext
 from colorama import Fore, Style, init
 import yaml
-from . import GifTkinter
+# from . import GifTkinter
 from .custom.liner import Liner
-from .Runner import Runner
+# from .Runner import Runner
+from .ImportRunner_pyc import Runner
 from .Edition_logs import English_Edition_logsForEditor, Chinese_Edition_logsForEditor
 from .VersionSystem import VersionSystem
 from .folder import folder
@@ -45,13 +46,15 @@ from .PluginAPI import (
     TextList,
 )
 from .Plugin import (
-    LoadPlugins,
+    LoadPluginModifyText,
     # GetLoadedPlugins,
     GetInstalledPluginsList,
     GetAllPlugins,
     FindPlugin,
     InstallPlugin,
+    LoadPluginsNormal,
     PluginsPath,
+    RegisterPlugins,
     # PluginsPath,
     UninstallPlugin,
     # PluginsIconDict,
@@ -66,21 +69,21 @@ init()
 
 # , 800, 600, 200, 200
 
-AT = '''\
-This is the XRthon editor
+# AT = '''\
+# This is the XRthon editor
 
-It is made by '是星星与然然呀' （由 '是星星与然然呀' 制作）
-(The files in the 'custom' folder were all created by 'LoveProgramming' , but I made some modifications to fit my programming language)
-（（ ‘custom’ 文件夹下的文件均由  ‘LoveProgramming’  制作，但由于为了贴合我的编程语言，所以我修改了一部分））\
-''' # about text
+# It is made by '是星星与然然呀' （由 '是星星与然然呀' 制作）
+# (The files in the 'custom' folder were all created by 'LoveProgramming' , but I made some modifications to fit my programming language)
+# （（ ‘custom’ 文件夹下的文件均由  ‘LoveProgramming’  制作，但由于为了贴合我的编程语言，所以我修改了一部分））\
+# ''' # about text
 
-AUT = '''\
-是星星与然然呀：Contact information （联系方式） (QQ)：3771386319
-LoveProgramming：Contact information （联系方式） (163 Email （邮箱）)：sxxyrry_23XR@163.com
+# AUT = '''\
+# 是星星与然然呀：Contact information （联系方式） (QQ)：3771386319
+# LoveProgramming：Contact information （联系方式） (163 Email （邮箱）)：sxxyrry_23XR@163.com
 
-Sponsorship link （赞助链接） :
-https://ifdian.net/order/create?plan_id=b2d954aa5c7711ef8af952540025c377&product_type=0&remark=\
-''' # about us text
+# Sponsorship link （赞助链接） :
+# https://ifdian.net/order/create?plan_id=b2d954aa5c7711ef8af952540025c377&product_type=0&remark=\
+# ''' # about us text
 
 version = GetVersionForEditor()
 if VersionSystem.CheckVersion(version if '/NVSFT: ' not in version else version.split('/NVSFT: ')[1]):
@@ -95,7 +98,7 @@ else:
 TempPath = os.path.join(folder, './temp')
 
 class Editor():
-    def __init__(self):
+    def __init__(self, NewTextList: list[str] | None = None):
         self.frames: list[tuple[tk.Frame, Liner]] = frames
         self.framesInfo: list[tk.Frame] = framesInfo
         self.frame_id = -1
@@ -109,7 +112,7 @@ class Editor():
         self.bind_shortcuts()
         self.config = config
 
-        self.texts = TextList
+        self.texts = NewTextList if NewTextList is not None else TextList
 
         self.Run_Button = tk.Button(self.Bottom, text=self.texts[0], command=self.RunCode)
         self.Run_Button.pack(side=tk.RIGHT)
@@ -194,28 +197,49 @@ class Editor():
             self.Notice.EmitErrorNotice(self.texts[46], self.texts[47])
 
     def Introduction_Website(self):
-        webbrowser.open('https://sxxyrry.github.io/XRthon_Project/')
+        webbrowser.open('https://sxxyrry.github.io/aithon_Project/')
 
     def Restart(self):
         os.startfile(os.path.join(folder, "./Editor.py"), show_cmd=1)
         os._exit(0)
 
     def switch_language(self):
-        if self.config.language == 'en':
-            a = 'English'
-            b = '中文'
-            if messagebox.askyesno(self.texts[22], f'{a} -> {b}'): # type: ignore
-                self.config.SwitchLanguage('zh-cn')
-            else:
-                return
-        elif self.config.language == 'zh-cn':
-            a = '中文'
-            b = 'English'
-            if messagebox.askyesno(self.texts[22], f'{a} -> {b}'): # type: ignore
-                self.config.SwitchLanguage('en')
-            else:
-                return
+        _ = tkt.Tk(title=self.texts[22])
 
+        value = [
+            "简体中文",
+            "English"
+        ]
+
+        selected_value = tk.StringVar(_)
+        value_: dict[str, str] = {
+            "zh-cn" : "简体中文",
+            "en" : "English"
+        }
+        value_a: dict[Literal['简体中文', 'English'], Literal['zh-cn', 'en']] = {j : i for i, j in value_.items()} # type: ignore
+        selected_value.set(value_[self.config.language]) # 设置默认值
+        a = tk.OptionMenu(_, selected_value, *value, command=lambda x: self.SwitchLanguage(value_a[str(x)])) # type: ignore
+        a.pack()
+
+        # if self.config.language == 'en':
+        #     a = 'English'
+        #     b = '中文'
+        #     if messagebox.askyesno(self.texts[22], f'{a} -> {b}'): # type: ignore
+        #         self.config.SwitchLanguage('zh-cn')
+        #     else:
+        #         return
+        # elif self.config.language == 'zh-cn':
+        #     a = '中文'
+        #     b = 'English'
+        #     if messagebox.askyesno(self.texts[22], f'{a} -> {b}'): # type: ignore
+        #         self.config.SwitchLanguage('en')
+        #     else:
+        #         return
+
+        
+
+    def SwitchLanguage(self, language: Literal['en', 'zh-cn']):
+        self.config.SwitchLanguage(language)
         messagebox.showinfo(self.texts[16], self.texts[17]) # type: ignore
 
     def bind_shortcuts(self):
@@ -299,12 +323,12 @@ class Editor():
                         token,
                         'sxxyrry',
                         'aithonPluginsDatabase',
-                        f'Plugins/{PluName}/{yaml.safe_load(
+                        f'plugins/{PluName}/{yaml.safe_load(
                             GetFileText(
                                 token,
                                 'sxxyrry',
                                 'aithonPluginsDatabase',
-                                f'Plugins/{PluName}/config.json'
+                                f'plugins/{PluName}/config.json'
                             )
                         )['EditionLogsFilePath'][2::]}'
                     )
@@ -385,7 +409,7 @@ class Editor():
                 token,
                 'sxxyrry',
                 'aithonPluginsDatabase',
-                f'Plugins/{PluName}/config.json'
+                f'plugins/{PluName}/config.json'
             ))
 
             IconFP = config['IconFilePath']
@@ -404,7 +428,7 @@ class Editor():
                 token,
                 'sxxyrry',
                 'aithonPluginsDatabase',
-                f'Plugins/{PluName}/{IconFP}',
+                f'plugins/{PluName}/{IconFP}',
                 IconLFP
             )
 
@@ -422,7 +446,7 @@ class Editor():
                 token,
                 'sxxyrry',
                 'aithonPluginsDatabase',
-                f'Plugins/{PluName}/{config['MarkdownFilePathForDescribingInformation']}'
+                f'plugins/{PluName}/{config['MarkdownFilePathForDescribingInformation']}'
             )}'
 
             InfoBtn = tk.Button(f, text=self.texts[49], command=lambda PluName=PluName, info=info: AddInfoPage(PluName, info))
@@ -662,6 +686,7 @@ class Editor():
         self.parent.pack(fill=tk.NONE, expand=True)
 
 def start():
+    # sys.path.append(str(folder))
     global root, TextList  # 确保使用全局的 root 变量
     # root = tkt.Tk("XRthon Editor")  # 创建新的主窗口
 
@@ -703,18 +728,21 @@ def start():
     IconLbl.destroy()
     SignLbl.destroy()
 
-    gif = GifTkinter.AnimatedGif(root, os.path.join(folder, './Images/_23XRStudio.gif')) # type: ignore
+    # gif = GifTkinter.AnimatedGif(root, os.path.join(folder, './Images/_23XRStudio.gif')) # type: ignore
 
-    gif.start()
+    # gif.start()
 
-    gif.master.destroy()
+    # gif.master.destroy()
 
-    TextList = LoadPlugins()
+    RegisterPlugins()
+    TextList = LoadPluginModifyText()
 
     notice.pack()
 
-    editor = Editor()
+    editor = Editor(TextList)
     editor.pack()
+
+    LoadPluginsNormal()
 
     editor.add_editor_page()
 

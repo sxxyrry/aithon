@@ -11,9 +11,13 @@ from ...PluginAPI import (
     FindPlugin, # type: ignore
     ImportPlugin, # type: ignore
     GetVersionForEditionLogs_Plugin, # type: ignore
+    PluginNormalBaseClass,
 )
 
 
-_ = tk.Menu()
-_.add_command(label="b", command=lambda: print("b"))
-Up.add_cascade(label="b", menu=_)
+class Plugin_(metaclass=PluginNormalBaseClass):
+    @staticmethod
+    def UsePlugin():
+        _ = tk.Menu()
+        _.add_command(label="b", command=lambda: print("b"))
+        Up.add_cascade(label="b", menu=_)

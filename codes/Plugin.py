@@ -7,27 +7,54 @@ from .PluginAPI import *
 from .GithubAboutFile import ListDir, DownloadDir
 from .BaseGConfig import token
 from .logs import Plugins_log
+from .PluginBaseClass import PluginModifyTextBaseClass, PluginNormalBaseClass, PluginBaseClass
 
 
 PluginsPath = os.path.join(folder, './plugins')
 PluginsIconDict: dict[str, ImageTk.PhotoImage] = {}
 
 def GetAllPlugins() -> list[str]:
-    return ListDir(token, 'sxxyrry', 'XRthonPluginsDatabase', 'Plugins')
+    PluginsList: list[str] = ListDir(token, 'sxxyrry', 'aithonPluginsDatabase', 'plugins')
+    NewPL: list[str] = []
+    for PluName in PluginsList:
+        if PluName == 'a' or PluName == '__init__.py' or PluName == '__pycache__':
+            continue
+        else:
+            NewPL.append(PluName)
+    return NewPL
 
 def UninstallPlugin(PluName: str):
     if os.path.exists(os.path.join(PluginsPath, f'./{PluName}')):
         shutil.rmtree(os.path.join(PluginsPath, f'./{PluName}'))
 
 def InstallPlugin(PluName: str):
-    DownloadDir(token, 'sxxyrry', 'XRthonPluginsDatabase', f'Plugins/{PluName}', os.path.join(PluginsPath, f'./{PluName}'))
+    DownloadDir(token, 'sxxyrry', 'aithonPluginsDatabase', f'plugins/{PluName}', os.path.join(PluginsPath, f'./{PluName}'))
 
-def LoadPlugins() -> list[str]:
-    tl: list[str] = TextList.copy()
+def LoadPluginModifyText() -> list[str]:
+    TL: list[str] = TextList.copy()
+    for cls in PluginModifyTextBaseClass.Register:
+        clsobj: PluginBaseClass = cls()
+        
+        TL: list[str] = clsobj.UsePlugin() # type: ignore
+    return TL # type: ignore
+
+def LoadPluginsNormal() -> None:
+    for cls in PluginNormalBaseClass.Register:
+        clsobj: PluginBaseClass = cls()
+        
+        clsobj.UsePlugin() # type: ignore
+    return
+
+def RegisterPlugins():
     for dir_ in os.listdir(PluginsPath):
         if dir_ == 'a' and os.path.isfile(os.path.join(PluginsPath, dir_)):
             continue
+        if dir_ == '__init__.py' and os.path.isfile(os.path.join(PluginsPath, dir_)):
+            continue
+        if dir_ == '__pycache__' and os.path.isdir(os.path.join(PluginsPath, dir_)):
+            continue
         path = os.path.join(PluginsPath, dir_)
+
         if IsPlugin(path):
             path = pathlib.Path(path).resolve()
             
@@ -38,43 +65,22 @@ def LoadPlugins() -> list[str]:
                 continue
             else:
                 Plugins_log.info(f"Loading plugin {dir_} ({path})")
-                filePath = os.path.join(path, './__init__.py')
+                filePath = os.path.join(path, '__init__.py')
 
                 try:
                     with open(filePath, 'r', encoding='UTF-8') as f:
                         c = f.read()
-                        c = c.replace('../../', '')
-                        c = c.replace('...', '')
-                        exec(c, {'TextList' : tl})
-                    
+                        c = c.replace('../../', './codes/')
+                        c = c.replace('...', 'codes.')
+                        exec(c)
+                   
                     LoadedPluginsList.append(dir_)
-                    Plugins_log.info(f"Plugin {dir_} loaded ({path})")
+                    Plugins_log.info(f"Plugin {dir_} Registered ({path})")
                 except Exception as e:
-                    Plugins_log.warning(f"Error loading plugin {dir_}: {e} ({path})")
+                    Plugins_log.warning(f"Error Registering plugin {dir_}: {e} ({path})")
                     
         else:
             Plugins_log.warning(f"Plugin {dir_} isn't a plugin ({path})")
-            raise Exception(f"Plugin {dir_} isn't a plugin ({path})")
-        
-    return tl
-        # elif os.path.isfile(path):
-        #     if file.endswith('.py'):
-        #         module_name = file[:-3]
-        #         module_path = os.path.join(PluginsPath, file)
-
-        #         Plugins_log.info(f"Loading plugin {module_name} ({module_path})")
-
-        #         try:
-        #             with open(module_path, 'r') as f:
-        #                 c = f.read()
-        #                 c = c.replace('../', '')
-        #                 c = c.replace('..', '')
-        #                 exec(c, globals())
-                    
-        #             LoadedPluginsList.append(module_name)
-        #             Plugins_log.info(f"Plugin {module_name} loaded ({module_path})")
-        #         except Exception as e:
-        #             Plugins_log.warning(f"Error loading plugin {module_name}: {e} ({module_path})")
 
 def IsPlugin(Path: str) -> bool:
     if os.path.isdir(Path):
@@ -87,7 +93,7 @@ def IsPlugin(Path: str) -> bool:
                 if os.path.exists(os.path.join(Path, '__init__.py')):
                     if os.path.exists(os.path.join(Path, 'config.json')):
                         try:
-                            with open(os.path.join(Path, 'config.json'), 'r') as f: config: dict[str, str] = json.load(f)
+                            with open(os.path.join(Path, 'config.json'), 'r', encoding="UTF-8") as f: config: dict[str, str] = json.load(f)
                         except Exception: return False
                         
                         if "EditionLogsFilePath" in config and "state" in config and "IconFilePath" in config and "OverviewText" in config and "MarkdownFilePathForDescribingInformation" in config:

@@ -1,11 +1,11 @@
 import os
-from .folder import folder
+from codes.folder import folder
 from types import NoneType
 from typing import Any, TypedDict
-from .versions import GetVersionForXRthon
-from .Edition_logs import Chinese_Edition_logsForXRthon, English_Edition_logsForXRthon
-from ._del_ import del___pycache__
-from .config import Config
+from codes.versions import GetVersionForXRthon
+from codes.Edition_logs import Chinese_Edition_logsForXRthon, English_Edition_logsForXRthon
+from codes._del_ import del___pycache__
+from codes.config import Config
 
 
 config = Config()
@@ -253,17 +253,15 @@ class Str(Object):
 
 class Int(Object):
     def __init__(self, value: object, number: int, linetext: str, path: str | None):
-        try:
-            self.value = int(value) # type: ignore
-        except Exception as e:
-            Raiser(
-                   'ValueError',
-                   f'Cannot convert {value} to int',
-                   number,
-                   linetext,
-                   path if not path is None else '<String>', # type: ignore
-                   e
-                  )
+        # 取消 try-except 块，直接进行类型转换
+        self.value = int(value) if str(value).isdigit() else Raiser( # type: ignore
+            'ValueError',
+            f'Cannot convert {value} to int',
+            number,
+            linetext,
+            path if not path is None else '<String>',
+            ValueError(f'Cannot convert {value} to int')
+        )
         
         self.number = number
         self.linetext = linetext
@@ -291,6 +289,14 @@ class Float(Object):
                    path if not path is None else '<String>',
                    e
                   )
+        self.value = float(value) if str(value).isdigit() else Raiser( # type: ignore
+            'ValueError',
+            f'Cannot convert {value} to float',
+            number,
+            linetext,
+            path if not path is None else '<String>',
+            ValueError(f'Cannot convert {value} to float')
+        )
         
         self.number = number
         self.linetext = linetext
@@ -373,6 +379,9 @@ class Function():
     
     def __repr__(self) -> str:
         return f'<Function {self.name}-{self.args}-isBuiltins={self.isBuiltins}>'
+
+def isNumbericString(value: str):
+    return str(value).isdigit() or str(value).replace('.', '').isdigit()
 
 class Runner():
 
@@ -739,7 +748,9 @@ class Expressions():
         value = ''.join(v_)
 
         try:
-            a = eval(value, globals=_) # type: ignore
+            # 使用 compile 替代 eval
+            code = compile(value, '<string>', 'eval')
+            a = eval(code, globals=_) # type: ignore
         except Exception as e:
             root.raiser(e.__class__.__name__, str(e), number, linetext, path if not path is None else '<String>', e, clsobj.config) # type: ignore
             return
@@ -756,21 +767,6 @@ class Expressions():
         else:
             type_ = Nonetype(None)
         
-        # elif isinstance(a, bool):
-        #     type_ = Bool(a)
-        
-        # elif isinstance(a, list):
-        #     type_ = List(a)
-        
-        # elif isinstance(a, dict):
-        #     type_ = Dict(a)
-        
-        # elif isinstance(a, tuple):
-        #     type_ = Tuple(a)
-        
-        # elif isinstance(a, set):
-        #     type_ = Set(a)
-
         return a, type_, False
 
 class Functions():
@@ -794,8 +790,8 @@ class Functions():
             p: str = linetext[6:][:-1]
             
             try:
-                _ = Variable.VariableLogic(clsobj, p, number, linetext, path if not path is None else '<String>') # type: ignore
-                p = _[0] # type: ignore
+                # _ = Variable.VariableLogic(clsobj, p, number, linetext, path if not path is None else '<String>') # type: ignore
+                # p = _[0] # type: ignore
                 p = Expressions.ExpressionsLogic(clsobj, p, linetext, number, path)[0] # type: ignore
             except Exception as e:
                 if not p == '':
@@ -969,7 +965,9 @@ class Functions():
         type_ = Str(v)
 
         try:
-            v = eval(v)
+            # 使用 compile 替代 eval
+            code = compile(v, '<string>', 'eval')
+            v = eval(code)
         except Exception as e:
             if type(e) == NameError:
                 root.raiser(

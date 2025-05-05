@@ -4,18 +4,22 @@ from ...PluginAPI import (
     Up,
     Bottom, # type: ignore
     tk,
-    tkt
+    tkt,
+    PluginNormalBaseClass
 )
 
-def a():
-    _ = tkt.Tk(title='TestPlugin')
+class Plugin_(metaclass=PluginNormalBaseClass):
+    @staticmethod
+    def UsePlugin():
+        def a():
+            _ = tkt.Tk(title='TestPlugin')
 
-    t = tk.Label(_, text='TestPlugin')
-    t.pack()
+            t = tk.Label(_, text='TestPlugin')
+            t.pack()
 
-    _.mainloop()
+            _.mainloop()
 
-_ = tk.Menu(Up)
-_.add_command(label='a', command=lambda: print('TestPlugin'))
-_.add_cascade(label='b', command=a)
-Up.add_cascade(label='TestPlugin', menu=_)
+        _ = tk.Menu(Up)
+        _.add_command(label='a', command=lambda: print('TestPlugin'))
+        _.add_cascade(label='b', command=a)
+        Up.add_cascade(label='TestPlugin', menu=_)
