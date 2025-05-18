@@ -1,5 +1,8 @@
 import sys, time
-from .Runner import Runner, config_root
+# from .Runner import Runner, config_root
+from .ImportRunner_pyc import Runner as RunnerModule
+Runner = RunnerModule.Runner
+config_root = RunnerModule.config_root
 # from Edition_logs import Edition_logsForXRthon
 from .VersionSystem import VersionSystem
 from colorama import init, Fore, Style, Back

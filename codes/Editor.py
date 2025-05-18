@@ -13,10 +13,9 @@ import _tkinter as _tk
 from tkinter import filedialog, messagebox, scrolledtext
 from colorama import Fore, Style, init
 import yaml
-# from . import GifTkinter
 from .custom.liner import Liner
-# from .Runner import Runner
-from .ImportRunner_pyc import Runner
+from .ImportRunner_pyc import Runner as RunnerModule
+Runner = RunnerModule.Runner
 from .Edition_logs import English_Edition_logsForEditor, Chinese_Edition_logsForEditor
 from .VersionSystem import VersionSystem
 from .folder import folder
@@ -25,29 +24,25 @@ from ._del_ import del___pycache__
 from .GithubAboutFile import GetFileText, DownloadFile
 from .BaseGConfig import token
 from .PluginAPI import (
-    # GetEditionLogs_Plugin,
     root,
     frames,
     parent,
     Up,
     Bottom,
     config,
-    # GetVersionForEditionLogs_Plugin,
     GetVersion,
     JudgeVersion_Less_Plugin,
     framesInfo,
     MainNotebook,
-    EditorNB,
-    EditorNBFrame,
     InfoNB,
     InfoNBFrame,
     AddInfoPage,
     notice,
     TextList,
+    CustomNotebook,
 )
 from .Plugin import (
     LoadPluginModifyText,
-    # GetLoadedPlugins,
     GetInstalledPluginsList,
     GetAllPlugins,
     FindPlugin,
@@ -55,44 +50,22 @@ from .Plugin import (
     LoadPluginsNormal,
     PluginsPath,
     RegisterPlugins,
-    # PluginsPath,
     UninstallPlugin,
-    # PluginsIconDict,
 )
 from .logs import Check_log, Runner_log
 import urllib3
+from PIL import Image, ImageTk, ImageFile
 
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 init()
 
-# , 800, 600, 200, 200
-
-# AT = '''\
-# This is the XRthon editor
-
-# It is made by '是星星与然然呀' （由 '是星星与然然呀' 制作）
-# (The files in the 'custom' folder were all created by 'LoveProgramming' , but I made some modifications to fit my programming language)
-# （（ ‘custom’ 文件夹下的文件均由  ‘LoveProgramming’  制作，但由于为了贴合我的编程语言，所以我修改了一部分））\
-# ''' # about text
-
-# AUT = '''\
-# 是星星与然然呀：Contact information （联系方式） (QQ)：3771386319
-# LoveProgramming：Contact information （联系方式） (163 Email （邮箱）)：sxxyrry_23XR@163.com
-
-# Sponsorship link （赞助链接） :
-# https://ifdian.net/order/create?plan_id=b2d954aa5c7711ef8af952540025c377&product_type=0&remark=\
-# ''' # about us text
-
 version = GetVersionForEditor()
 if VersionSystem.CheckVersion(version if '/NVSFT: ' not in version else version.split('/NVSFT: ')[1]):
     Check_log.info(f'{Fore.GREEN}Check: Your aithon Editor Version format is Normal.{Style.RESET_ALL}')
-    # messagebox.showinfo("Check", "Your XRthon Version format is Normal.")
 else:
     Check_log.warning(f'{Fore.RED}Check: Your aithon Editor Version format is Invalid.{Style.RESET_ALL}')
-    # messagebox.showinfo("Check", "Your XRthon Version format is Invalid.")
-    raise SystemExit()
 
 
 TempPath = os.path.join(folder, './temp')
@@ -124,12 +97,10 @@ class Editor():
         self.File_menu.add_command(label=self.texts[2], command=self.open_file)
         self.File_menu.add_command(label=self.texts[3], command=self.save_file)
         self.File_menu.add_command(label=self.texts[4], command=self.choose_file_and_run)
-        # self.File_menu.pack(side=tk.LEFT)
 
         self.About_menu = tk.Menu(self.Up)
         self.About_menu.add_command(label=self.texts[5], command=self.AboutInterface)
         self.About_menu.add_command(label=self.texts[6], command=self.AboutUsInterface)
-        # lambda: messagebox.showinfo("About Us", AUT)
 
         self.Plugin_menu = tk.Menu(self.Up)
         self.Plugin_menu.add_command(label=self.texts[28], command=self.AllPluginsInterface)
@@ -142,23 +113,76 @@ class Editor():
         self.Up.add_cascade(label=self.texts[10], menu=self.File_menu)
         self.Up.add_cascade(label=self.texts[11], menu=self.About_menu)
         self.Up.add_cascade(label=self.texts[12], menu=self.Plugin_menu)
-        # self.Up.add_command(label="Edition Logs", command=self.EditionLogsInterface)
         self.Up.add_cascade(label=self.texts[13], menu=self.EditionLogs_menu)
-        if self.config.Mod == 'DEV':
+        if self.config.Mode == 'DEV':
             self.Up.add_command(label="Restart", command=self.Restart)
-            # self.Up.add_command(label="Toggle Theme", command=self.toggle_theme)
+            # self.Up.add_command(label=self.texts[24], command=self.Restart)
+
+            pass
         self.Up.add_command(label=self.texts[22], command=self.switch_language)
         self.Up.add_command(label=self.texts[23], command=self.Introduction_Website)
         self.Up.add_command(label=self.texts[14], command=self.VersionInterface)
-        # self.Up.add_command(label=self.texts[42], command=self.TestProgramInterface)
         self.Up.add_command(label=self.texts[15], command=lambda: os._exit(0))
         
         self.root.config(menu=self.Up)
 
-        self.MainNotebook = MainNotebook
+        self.ResourceManager = tk.Frame(self.parent, bd=2, relief="solid")
+        # _f_ = tk.Frame(self.ResourceManager)
+        # _f_.pack(fill=tk.BOTH)
+        _f = tk.Frame(self.ResourceManager)
+        _f.pack(side=tk.TOP)
+        _text = tk.Label(_f, text=self.texts[50])
+        _text.grid(row=0, column=0)
+        _btn = tk.Button(_f, text=self.texts[51], command=self.ChooseDirToResourceManager)
+        _btn.grid(row=0, column=1)
+        _a = tk.Label(self.ResourceManager, text=' '*100)
+        _a.pack()
+        self.FileViewRoot = tk.Frame(self.ResourceManager)
 
-        self.EditorNB = EditorNB
-        self.EditorNBFrame = EditorNBFrame
+        
+        # 创建一个包含滚动条的Canvas
+        canvas = tk.Canvas(self.FileViewRoot) # 移除了宽度和高度的直接设定
+        self.FileView = tk.Frame(canvas)
+        self.FileView.pack(fill=tk.BOTH)
+        scrollbar = tk.Scrollbar(self.FileViewRoot, orient="vertical", command=canvas.yview) # type: ignore
+        h_scrollbar = tk.Scrollbar(self.FileViewRoot, orient="horizontal", command=canvas.xview)  # type: ignore
+
+
+        # 绑定滚动条到Canvas
+        canvas.configure(yscrollcommand=scrollbar.set)
+        canvas.pack(side="right", fill="both", expand=True) # 使用pack()之前设置fill和expand
+        scrollbar.pack(side="right", fill="y") # 保持在Canvas pack之后
+        h_scrollbar.pack(side="bottom", fill="x")
+
+        # 在 Canvas 中绑定鼠标中键事件
+        canvas.bind("<Button-2>", lambda event: canvas.yview_scroll(-1 * (event.delta // 120), "units"))
+
+        # 如果你希望支持鼠标滚轮滚动，可以绑定 <MouseWheel> 事件
+        canvas.bind("<MouseWheel>", lambda event: canvas.yview_scroll(-1 * (event.delta // 120), "units"))
+
+        # 在Canvas内部创建窗口
+        canvas.create_window((0, 0), window=self.FileView, anchor='nw')
+
+        # 配置Canvas的滚动行为
+        self.FileView.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+
+        # 绑定横向滚动条到 Canvas
+        canvas.configure(xscrollcommand=h_scrollbar.set)
+
+        # 配置 Canvas 的滚动区域
+        self.FileView.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+
+        # CTRL+鼠标滚轮横向滚动 Canvas
+        self.FileView.bind("<Control-MouseWheel>", lambda e: canvas.xview_scroll(int(-1 * (e.delta / 120)), "units"))
+        
+        self.ResourceManager.pack(side=tk.LEFT, fill=tk.Y)
+        self.FileViewRoot.pack(fill=tk.BOTH, expand=True)
+        self.MainNotebook = MainNotebook
+        self.MainNotebook.pack(fill=tk.BOTH, expand=True)
+
+        self.EditorNBFrame = tk.Frame(self.parent)
+        self.EditorNB = CustomNotebook(self.EditorNBFrame)
+        self.EditorNB.pack(fill=tk.BOTH, expand=True)
 
         self.InfoNB = InfoNB
         self.InfoNBFrame = InfoNBFrame
@@ -175,11 +199,88 @@ class Editor():
 
         self.TestCanConnectTheDatabase()
 
+    def ChooseDirToResourceManager(self):
+        Dir = filedialog.askdirectory()
+        if Dir:
+            self.AddResourceManagerDir(Dir, self.FileView)
+    
+    def AddResourceManagerDir(self, Dir: str, Frame: tk.Frame):
+        DirList = os.listdir(Dir)
+        # print(DirList)
+        # 以文件夹，文件的顺序进行排列
+        DirList.sort(key=lambda x: os.path.isdir(os.path.join(Dir, x)), reverse=True)
+        # DirList.sort(key=lambda x: os.path.isdir(os.path.join(Dir, x)))
+        for i in DirList:
+            if os.path.isdir(os.path.join(Dir, i)):
+                DirFrame = tk.Frame(Frame)
+                DirFrame.pack(fill=tk.X)
+                Frame_ = tk.Frame(DirFrame)
+                Frame_.pack(side=tk.BOTTOM)
+                DirImg: ImageFile.ImageFile = Image.open(os.path.join(folder, './Images/Dir.png')) # type: ignore
+                DirImgTk = ImageTk.PhotoImage(DirImg.resize((23, 23))) # type: ignore
+
+                DirImgLabel = tk.Label(DirFrame, image=DirImgTk)
+                DirImgLabel.image = DirImgTk # type: ignore
+                DirImgLabel.pack(side=tk.LEFT)
+
+                _lbl = tk.Label(DirFrame, text=self.texts[52])
+                _lbl.pack(side=tk.LEFT)
+
+                DirLabel = tk.Label(DirFrame, text=i)
+                DirLabel.pack(side=tk.LEFT)
+                DirButton = tk.Button(DirFrame, text='+')
+                DirButton.config(command=lambda i=i, Frame_=Frame_, DirButton=DirButton: self._ARMDCommand(os.path.join(Dir, i), Frame_, DirButton))
+                DirButton.pack(side=tk.RIGHT)
+            else:
+                self.AddResourceManagerFile(i, Frame, Dir)
+    
+    def _ARMDCommand(self, Dir: str, Frame: tk.Frame, Btn: tk.Button):
+        if Btn['text'] == '+':
+            Btn.config(text='-')
+            self.AddResourceManagerDir(Dir, Frame)
+        else:
+            Btn.config(text='+')
+            for i in [i for i in Frame.winfo_children()]:
+                i.destroy()
+            Frame.config(height=0)
+            Frame.configure(height=0)
+            Frame.update_idletasks()
+            Frame.update()
+
+    def AddResourceManagerFile(self, File: str, Frame: tk.Frame, Dir:str):
+        FileFrame = tk.Frame(Frame)
+        FileFrame.pack(fill=tk.X)
+        
+        FileImg: ImageFile.ImageFile = Image.open(os.path.join(folder, './Images/File.png')) # type: ignore
+        if File.endswith('.ait'):
+            FileImg: ImageFile.ImageFile = Image.open(os.path.join(folder, './Images/aithonFile.png')) # type: ignore
+        FileImgTk = ImageTk.PhotoImage(FileImg.resize((23, 23))) # type: ignore
+
+        FileImgLabel = tk.Label(FileFrame, image=FileImgTk)
+        FileImgLabel.image = FileImgTk # type: ignore
+        FileImgLabel.pack(side=tk.LEFT)
+
+        _lbl = tk.Label(FileFrame, text=self.texts[53])
+        if File.endswith('.ait'):
+            _lbl.config(text=self.texts[54])
+        _lbl.pack(side=tk.LEFT)
+
+        if File.endswith('.ait'):
+            FileBtn = tk.Button(FileFrame, text=File, command=lambda File=os.path.join(Dir, File): self.OpenAithonFile(File))
+            FileBtn.pack(side=tk.LEFT)
+        else:
+            FileLabel = tk.Label(FileFrame, text=File)
+            FileLabel.pack(side=tk.LEFT)
+
+    def OpenAithonFile(self, File: str):
+        self.add_editor_page()
+        self.frames[-1][1].load_content(open(File, 'r', encoding='UTF-8').read())
+
     def TestCanConnectTheDatabase_(self):
         # 发送网络请求到 Github 私人仓库，如果请求速度超过2秒，视为网络连接失败
         import requests
         def check_repo(url: str):
-            try: response = requests.get(url, timeout=2, verify=False); return response.status_code == 200 #
+            try: response = requests.get(url, timeout=2, verify=False); return response.status_code == 200
             except requests.exceptions.RequestException: return False
         repos = [
             'https://api.github.com/repos/sxxyrry/aithonPluginsDatabase',
@@ -200,8 +301,12 @@ class Editor():
         webbrowser.open('https://sxxyrry.github.io/aithon_Project/')
 
     def Restart(self):
-        os.startfile(os.path.join(folder, "./Editor.py"), show_cmd=1)
-        os._exit(0)
+        # os.startfile(os.path.join(folder, "./Editor.py"), show_cmd=1)
+        # os._exit(0)
+        global root
+        self.root.destroy()
+        root = tkt.Tk((1920, 1032), (0, 0), title="aithon Editor")
+        start()
 
     def switch_language(self):
         _ = tkt.Tk(title=self.texts[22])
@@ -220,23 +325,6 @@ class Editor():
         selected_value.set(value_[self.config.language]) # 设置默认值
         a = tk.OptionMenu(_, selected_value, *value, command=lambda x: self.SwitchLanguage(value_a[str(x)])) # type: ignore
         a.pack()
-
-        # if self.config.language == 'en':
-        #     a = 'English'
-        #     b = '中文'
-        #     if messagebox.askyesno(self.texts[22], f'{a} -> {b}'): # type: ignore
-        #         self.config.SwitchLanguage('zh-cn')
-        #     else:
-        #         return
-        # elif self.config.language == 'zh-cn':
-        #     a = '中文'
-        #     b = 'English'
-        #     if messagebox.askyesno(self.texts[22], f'{a} -> {b}'): # type: ignore
-        #         self.config.SwitchLanguage('en')
-        #     else:
-        #         return
-
-        
 
     def SwitchLanguage(self, language: Literal['en', 'zh-cn']):
         self.config.SwitchLanguage(language)
@@ -280,11 +368,7 @@ class Editor():
 
             img = ImageTk.PhotoImage(img_, master=_)
 
-            # print(img, img.height(), img.width(), img.tk, img._PhotoImage__photo, img._PhotoImage__mode, img._PhotoImage__size)
             f = tk.Frame(_)
-
-            # btn = tk.Button()
-            # btn.pack()
 
             state_: str = PluginsList[i][1]
 
@@ -335,25 +419,6 @@ class Editor():
                 )
             ):
                 UpdateBtn.config(state='normal')
-
-            # OverviewTextLbl = tk.Label(f, text=f"{PluginsList[i][3]}")
-            # OverviewTextLbl.grid(row=1, column=2, sticky='w')
-
-            # print(f'{GetVersion(
-            #         GetFileText(
-            #             token,
-            #             'sxxyrry',
-            #             'XRthonPluginsDatabase',
-            #             f'Plugins/{PluName}/{yaml.safe_load(
-            #                 GetFileText(
-            #                     token,
-            #                     'sxxyrry',
-            #                     'XRthonPluginsDatabase',
-            #                     f'Plugins/{PluName}/config.json'
-            #                 )
-            #             )['EditionLogsFilePath'][2::]}'
-            #         )
-            #     )=}')
 
             UpdateBtn.grid(row=0, column=4, sticky='w')
 
@@ -415,10 +480,6 @@ class Editor():
             IconFP = config['IconFilePath']
 
             IconFP = IconFP[2::] if IconFP[:2] == './' else IconFP
-
-
-
-            # print(config, IconFP[:1])
 
             IconLFP = os.path.join(TempPath, f'{IconFP}')
 
@@ -500,11 +561,6 @@ class Editor():
     def AboutInterface(self):
         _ = tkt.Tk(title=self.texts[5])
 
-        # t = scrolledtext.ScrolledText(_, width=100, height=20)
-        # t.insert(tk.END, AT)
-        # t.config(state='disabled')
-        # t.pack()
-
         text1 = tk.Label(_,
             text="这是由 23XR 工作室 提供的 aithon 编辑器。使用 GUN GPL v3.0 许可证。",
         )
@@ -530,11 +586,6 @@ class Editor():
 
     def AboutUsInterface(self):
         _ = tkt.Tk(title=self.texts[6])
-
-        # t = scrolledtext.ScrolledText(_, width=100, height=20)
-        # t.insert(tk.END, AUT)
-        # t.config(state='disabled')
-        # t.pack()
 
         StudioFrame = tk.Frame(_)
         StudioFrame.pack(fill='x')
@@ -659,10 +710,10 @@ class Editor():
         frame.bind('<Visibility>', lambda event: self.add_updater(frame, line))
         frame.bind('<<NotebookTabClosed>>', self.OnCloseEditorPage) # type: ignore
         if self.i == 0:
-            self.EditorNB.add(frame, text=f"XRthon{self.texts[24]}")
+            self.EditorNB.add(frame, text=f"aithon{self.texts[24]}")
             self.EditorNB.protect_tab(len(self.frames) - 1)
         else:
-            self.EditorNB.add(frame, text=f"XRthon{self.texts[24]} {self.i + 1}")
+            self.EditorNB.add(frame, text=f"aithon{self.texts[24]} {self.i + 1}")
         
         self.MainNotebook.select(0) # type: ignore
         self.EditorNB.select(len(self.frames) - 1) # type: ignore
@@ -686,9 +737,7 @@ class Editor():
         self.parent.pack(fill=tk.NONE, expand=True)
 
 def start():
-    # sys.path.append(str(folder))
     global root, TextList  # 确保使用全局的 root 变量
-    # root = tkt.Tk("XRthon Editor")  # 创建新的主窗口
 
     texts = []
 
@@ -709,7 +758,7 @@ def start():
     else:
         texts = _EN()
 
-    IconPNG = ImageTk.PhotoImage(Image.open(os.path.join(folder, './Images/Icon_XRthon.png')).resize((370, 70))) # type: ignore
+    IconPNG = ImageTk.PhotoImage(Image.open(os.path.join(folder, './Images/Icon_aithon_BIGGER.png')).resize((370, 70))) # type: ignore
 
     SignPNG = ImageTk.PhotoImage(Image.open(os.path.join(folder, './Images/Sign_23XR_Bigger.png')).resize((330, 180))) # type: ignore
 
@@ -739,29 +788,31 @@ def start():
 
     notice.pack()
 
-    editor = Editor(TextList)
-    editor.pack()
-
-    LoadPluginsNormal()
-
-    editor.add_editor_page()
-
-    AddInfoPage(texts[0], texts[1])
-
-    if len(sys.argv) == 2:
-        editor.frames[editor.frame_id][1].load_content(open(sys.argv[1], 'r', encoding='UTF-8').read())
-
-    root.update()
-    editor.update()
-    
-    # messagebox.showinfo(texts[0], texts[1])
-
     try:
-        while True:
-            root.update()
-            editor.update()
-    except KeyboardInterrupt:
-        del___pycache__()
+        editor = Editor(TextList)
+        editor.pack()
+
+        LoadPluginsNormal()
+
+        editor.add_editor_page()
+
+        AddInfoPage(texts[0], texts[1])
+
+        if len(sys.argv) == 2:
+            editor.frames[-1][1].load_content(open(sys.argv[1], 'r', encoding='UTF-8').read())
+
+        root.update()
+        editor.update()
+        
+        try:
+            while True:
+                root.update()
+                editor.update()
+        except KeyboardInterrupt:
+            del___pycache__()
+    except Exception as e:
+        messagebox.showerror('Error', str(e)) # type: ignore
+        pass
 
     del___pycache__()
 

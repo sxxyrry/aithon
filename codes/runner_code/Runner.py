@@ -1,14 +1,73 @@
 import os
-from codes.folder import folder
+import pathlib
+
+
+# folder = pathlib.Path(__file__).parent.parent.resolve()
+folder = pathlib.Path(__file__).parent.resolve()
+
 from types import NoneType
 from typing import Any, TypedDict
-from codes.versions import GetVersionForXRthon
-from codes.Edition_logs import Chinese_Edition_logsForXRthon, English_Edition_logsForXRthon
-from codes._del_ import del___pycache__
-from codes.config import Config
 
 
-config = Config()
+def GetVersionForXRthon():
+    version = ''
+
+    for _ in English_Edition_logsForXRthon.split('\n'):
+        if _.endswith(' Version:'):
+            version: str = _[:-9]
+        elif _.endswith(' Version:\r'):
+            version: str = _[:-10]
+    
+    return version
+
+def GetVersionForEditor():
+    version = ''
+
+    for _ in English_Edition_logsForEditor.split('\n'):
+        if _.endswith(' Version:'):
+            version: str = _[:-9]
+        elif _.endswith(' Version:\r'):
+            version: str = _[:-10]
+    
+    return version
+
+def GetVersion(EditionLogs: str) -> str:
+    version = ''
+
+    for _ in EditionLogs.split('\n'):
+        if _.endswith(' Version:'):
+            version: str = _[:-9]
+        elif _.endswith(' Version:\r'):
+            version: str = _[:-10]
+    
+    return version
+
+
+with open(os.path.join(folder, './TextFIles/Edition_logs/English/Edition_logsForaithon.txt'), 'r', encoding='UTF-8') as f:
+    English_Edition_logsForXRthon: str = f.read()
+
+with open(os.path.join(folder, './TextFIles/Edition_logs/English/Edition_logsForEditor.txt'), 'r', encoding='UTF-8') as f:
+    English_Edition_logsForEditor: str = f.read()
+
+with open(os.path.join(folder, './TextFIles/Edition_logs/Chinese/Edition_logsForaithon.txt'), 'r', encoding='UTF-8') as f:
+    Chinese_Edition_logsForXRthon: str = f.read()
+
+with open(os.path.join(folder, './TextFIles/Edition_logs/Chinese/Edition_logsForEditor.txt'), 'r', encoding='UTF-8') as f:
+    Chinese_Edition_logsForEditor: str = f.read()
+
+import shutil
+def del_file(path: str):
+    shutil.rmtree(path)
+
+def del___pycache__():
+    if os.path.exists('./custom/__pycache__/'):
+        del_file('./custom/__pycache__/')
+    if os.path.exists('./log/__pycache__/'):
+        del_file('./log/__pycache__/')
+    if os.path.exists('./VersionSystem/__pycache__'):
+        del_file('./VersionSystem/__pycache__')
+    if os.path.exists('./__pycache__'):
+        del_file('./__pycache__')
 
 KernelName = 'XRXRthonRunner'
 
@@ -401,13 +460,52 @@ class Runner():
             {
                 'Kernel' : {
                     'value' : {
-                        'Name' : KernelName,
-                        'Version' : version
+                        'Name' : {
+                            'value' : KernelName,
+                            'type' : Str(KernelName),
+                            'len' : len(KernelName)
+                        },
+                        'Version' : {
+                            'value' : version,
+                            'type' : Str(version),
+                            'len' : len(version)
+                        },
                     },
+                    'type' : Object({
+                        'Name' : {
+                                'value' : KernelName,
+                                'type' : Str(KernelName),
+                                'len' : len(KernelName)
+                            },
+                            'Version' : {
+                                'value' : version,
+                                'type' : Str(version),
+                                'len' : len(version)
+                            }
+                        }
+                    ),
+                    'len' : 2
                     # 'type' : {
 
                     # }
                 },
+                '__SYSTEM__' : {
+                    'value' : {
+                        'Name' : {
+                            'value' : EnvironmentName,
+                            'type' : Str(EnvironmentName),
+                            'len' : len(EnvironmentName)
+                        },
+                    },
+                    'type' : Object({
+                        'Name' : {
+                            'value' : EnvironmentName,
+                            'type' : Str(EnvironmentName),
+                            'len' : len(EnvironmentName)
+                        },
+                    }),
+                    'len' : 1
+                }
             }
         )
         if not function:
@@ -433,7 +531,7 @@ class Runner():
         运行多行文本
 
         :param: texts 多行文本
-        :param: path 文件路径（不传则为<String>）
+        :param: path 文件路径（不传则为<String\\>）
         
         :return: None
         '''
@@ -707,6 +805,25 @@ class Expressions():
         i = 0
         while i < len(value):
             char = v_[i]
+            
+            if char == '[':
+                i_ = i + 1
+                i__ = i_ + 1
+
+                __ = '[\"value\"]['
+                while i_ < len(value):
+                    if value[i_] == ']':
+                        __ += ']'
+
+                        break
+                    else:
+                        __ += value[i_]
+                                        
+                    i_ += 1
+                    i__ += 1
+                
+                v_[i:i__] = __
+
             if char == '.':
                 # char = '['
                 if v_[i - 1].isdigit() and v_[i + 1].isdigit():
@@ -741,6 +858,7 @@ class Expressions():
                     v_[i] = '[\"value\"][\"'
                     if i_ == len(value):
                         v_.append('')
+                    # v_[i_] = '\"]'
                     v_[i_] = '\"][\"value\"]'
                 
             i += 1
@@ -752,8 +870,11 @@ class Expressions():
             code = compile(value, '<string>', 'eval')
             a = eval(code, globals=_) # type: ignore
         except Exception as e:
-            root.raiser(e.__class__.__name__, str(e), number, linetext, path if not path is None else '<String>', e, clsobj.config) # type: ignore
-            return
+            if value == '':
+                a = ''
+            else:
+                root.raiser(e.__class__.__name__, str(e), number, linetext, path if not path is None else '<String>', e, clsobj.config) # type: ignore
+                return
 
         if isinstance(a, str):
             type_ = Str(a)

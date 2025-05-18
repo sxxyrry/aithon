@@ -50,3 +50,6 @@ B--0--0.1--_indev--2025*5*1 Version:
     Removed GIF animation from the start interface
     Abandoning ImportPlugin API (temporary) Reason: Due to the modification of the import method of the plugin, it was abandoned (the author does not want to change it anymore)
     The plugin development document was temporarily abandoned
+B--0--0.1--_indev--2025*5*2 Version:
+    Added a simple resource manager
+    Updated image

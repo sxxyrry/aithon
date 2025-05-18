@@ -46,10 +46,6 @@
 
 ### 语法
 
-#### 看帮助文本
-
-### 帮助文本
-
 #### 使用“print()”输出文本。
 
 #### ""是一个字符串。
@@ -73,6 +69,7 @@
 ```XRthon
 def_func name{args}:
     # 代码
+
 ```
 
 #### ”创建一个名为“name”的函数，其参数为“args”。
@@ -84,6 +81,7 @@ def_func name{args}:
 ```XRthon
 python {args}：
     # Python代码
+
 ```
 
 #### ”创建和运行python代码，并具有参数‘args’（提示：‘args’参数已在前面定义）。
@@ -92,7 +90,8 @@ python {args}：
 
 ```XRthon
 if {1}:
-    # Code
+    # 代码
+
 ```
 
 #### ” 去创建 if 语句 （1是可以用另一个表达式替换的表达式）。
@@ -101,7 +100,8 @@ if {1}:
 
 ```XRthon
 while {1}:
-    # Code
+    # 代码
+
 ```
 
 #### ” 去创建 while 语句 （1是可以用另一个表达式替换的表达式）。
@@ -112,13 +112,13 @@ while {1}:
 
 ##### 编辑器
 
-###### 终端：& python.exe的绝对路径 Editor.py的绝对路径 aithon文件的绝对路径
+###### 终端：在运行 “Editor.py” 时增加aithon文件的绝对路径参数
 
 ###### 编辑器内：上方工具栏 File > Open File （文件 > 打开文件）然后选择文件，点右下角的 Run （运行）
 
 ##### aithon
 
-###### 终端：& python.exe的绝对路径 XRthon.py的绝对路径 aithon文件的绝对路径
+###### 终端：在运行 “aithon.py” 时增加aithon文件的绝对路径参数
 
 #### 编辑器
 
@@ -128,15 +128,9 @@ while {1}:
 
 ##### 终端：
 
-###### 1. & python.exe的绝对路径 aithon.py的绝对路径
+###### 1. 运行aithon.py
 
 ###### 2. 输入内容，回车键运行
-
-### 怎么运行 Python 文件？
-
-#### & python.exe的绝对路径 文件绝对路径
-
-#### “文件绝对路径”是要替换的文本，替换为要执行的文件绝对路径
 
 ---
 
@@ -255,4 +249,3 @@ while {1}:
 #### & python.exe absolute path file absolute path
 
 #### Replace "file absolute path" with the actual file path you want to execute
-

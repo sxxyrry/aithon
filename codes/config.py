@@ -8,11 +8,11 @@ class Config():
         with open(os.path.join(folder, './config/language.yaml'), 'r') as f:
             self.language: Literal['en', 'zh-cn'] = yaml.safe_load(f)['language']
         
-        with open(os.path.join(folder, './config/mod.yaml'), 'r') as f:
-            self.Mod: Literal['DEV', 'NAL'] = yaml.safe_load(f)['Mod']
+        with open(os.path.join(folder, './config/mode.yaml'), 'r') as f:
+            self.Mode: Literal['DEV', 'NAL'] = yaml.safe_load(f)['Mode']
 
         if self.language not in ['en', 'zh-cn']: raise Exception('Language not found.')
-        if self.Mod not in ['DEV', 'NAL']:
+        if self.Mode not in ['DEV', 'NAL']:
             raise Exception('Error!')
 
         self.languageList = ['en', 'zh-cn']

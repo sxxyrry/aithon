@@ -58,11 +58,21 @@ B--0--0.1--_indev--2025*2*4 Version:
     Added if statement
 B--0--0.1--_indev--2025*2*5 Version:
     Strict type inspection mode adapted to Pylance
-B--0--0.1--_indev--2025*4*1 version:
+B--0--0.1--_indev--2025*4*1 Version:
     updated Grammar (BREAKING CHANGE)
     Added a while statement
     Catalog structure optimizationed
     Changed the name to aithon
     Changed the suffix to. ait
+B--0--0.1--_indev--2025*4*2 Version:
+    (Hint: Version lost)
+    updated Grammar (BREAKING CHANGE)
+    Added a while statement
+    Catalog structure optimizationed
+    Changed the name to aithon
+    Changed the suffix to. ait
+    Some other modificationsed (I don't remember, after all, it took several months to develop)
 B--0--0.1--_indev--2025*5*1 Version:
     The runner used bytecode format that does not rely on cython (approximatelied)
+B--0--0.1--_indev--2025*5*2 Version:
+    Optimized Runner

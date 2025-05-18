@@ -2,7 +2,7 @@ from .custom.liner import Liner
 import tkinter as tk, tkintertools as tkt, pathlib, json, yaml # type: ignore
 from tkinter import filedialog, messagebox, scrolledtext # type: ignore
 # from .Runner import Runner # type: ignore
-from .ImportRunner_pyc import Runner
+from .ImportRunner_pyc import Runner # type: ignore
 from typing import Any, Literal, NoReturn # type: ignore
 import tkinter.ttk as ttk # type: ignore
 import _tkinter as _tk # type: ignore
@@ -115,6 +115,11 @@ def _EN():
         "Unable to connect to the database, please check your network connection",
         "Editor",
         "Info",
+        "Resource Manager",
+        "Choose Folder",
+        "(Folder)",
+        "(File)",
+        "(aithon File)",
     ]
 
 if config.language == 'en':
@@ -171,6 +176,11 @@ elif config.language == 'zh-cn':
         "无法连接到数据库，请检查网络连接。",
         "编辑器",
         "信息",
+        "资源管理器",
+        "选择文件夹",
+        "（文件夹）",
+        "（文件）",
+        "（aithon文件）",
     ]
 else:
     _EN()
@@ -182,9 +192,9 @@ def ChangeTextList(NewTextList: list[str]):
 
 LoadedPluginsList: list[str] = []
 FolderPath = pathlib.Path(os.path.join(pathlib.Path(__file__).parent.resolve(), './plugins/')).resolve()
-root = tkt.Tk(title="XRthon Editor")
+root = tkt.Tk((1920, 1032), (0, 0), title="aithon Editor")
 
-icon = toolbox.enhanced.PhotoImage(Image.open(os.path.join(pathlib.Path(__file__).parent.resolve(), './Images/Icon_XRthon.ico')))
+icon = toolbox.enhanced.PhotoImage(Image.open(os.path.join(pathlib.Path(__file__).parent.resolve(), './Images/Icon_aithon.ico')))
 
 root.icon(icon)
 
@@ -196,11 +206,6 @@ Bottom = tk.Frame(parent)
 # config = Config()
 
 MainNotebook = CustomNotebook(parent)
-MainNotebook.pack(fill=tk.BOTH, expand=True)
-
-EditorNBFrame = tk.Frame(parent)
-EditorNB = CustomNotebook(EditorNBFrame)
-EditorNB.pack(fill=tk.BOTH, expand=True)
 
 InfoNBFrame = tk.Frame(parent)
 InfoNB = CustomNotebook(InfoNBFrame)
