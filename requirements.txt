@@ -1,0 +1,14 @@
+colorama==0.4.6
+ghapi==1.0.6
+lark==1.2.2
+Pillow==11.2.1
+py7zr==0.22.0
+pyperclip==1.9.0
+PyYAML==6.0.2
+PyYAML==6.0.2
+Requests==2.32.3
+tkintertools==3.0.0
+urllib3==2.4.0
+pywinstyles==1.8
+sounddevice==0.5.2
+soundfile==0.13.1

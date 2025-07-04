@@ -1,0 +1,18 @@
+name%AITN 解释
+author%sxxyrry_23XR
+version%1.0
+affiliation%...
+
+<content>
+解释：
+    AITN 是指 aithon Norms , aithon 规范。
+    这个规范是关于 aithon 的。
+    分为:
+        1. AITC   - aithon Code           , aithon 代码规范
+        2. AITEP  - aithon Editor Plugin  , aithon 编辑器插件规范
+        3. AITCN  - aithon Coding Name    , aithon 编码命名规范
+        4. AITSC  - aithon Source Code    , aithon 源代码规范
+        5. AITD   - aithon Document       , aithon 文档规范
+    本规范是一个集合，是由多个小规范组成的！
+想添加关于运行 aithon 代码、插件的规范，请直接修改源代码的（Runner或custom文件夹下的liner）、Plugin！
+</content>

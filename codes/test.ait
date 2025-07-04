@@ -1,0 +1,22 @@
+a = "a"
+b = "b"
+c = 1 + 2 * (3 + 4)
+d = 1 + 2 * (3 + 4)
+e = 2 ** 3 + 1
+f = 2 ** 3 + 1
+g = 2.0 ** 3 + 1
+h = print
+i = print("Hello World")
+
+def_func func{arg}:
+    print(arg)
+
+if {1}:
+    print("1")
+elif {2}:
+    print("2")
+else:
+    print("3")
+
+while {1}:
+    print("1")

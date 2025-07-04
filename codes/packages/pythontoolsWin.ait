@@ -1,0 +1,30 @@
+def_func PythonCommand{command}:
+    python {command}:
+        import os, pathlib
+        pythonpath = pathlib.Path(__file__).parent.parent.absolute() / './Python313Win/python.exe'
+        # print(f'{pythonpath} {command}')
+        print(os)
+        os.system(f'{pythonpath} {command}')
+
+def_func getPythonVersion{}:
+    python {}:
+        import os, pathlib
+        pythonpath = pathlib.Path(__file__).parent.parent.absolute() / './Python313Win/python.exe'
+        os.system(f'{pythonpath} -c "import sys; print(sys.version)"')
+
+def_func __Python__{code, args}:
+    __OP__ {code, args}:
+        import os, pathlib
+        pythonpath = pathlib.Path(__file__).parent.parent.absolute() / './Python313Win/python.exe'
+        # pythonpath = pathlib.Path(__file__).parent.parent.parent.absolute() / './Python313Win/python.exe'
+        tempFile = pathlib.Path(__file__).parent.absolute() / './temp/temp.py'
+        # tempFile = pathlib.Path(__file__).parent.parent.absolute() / './temp/temp.py'
+        with open(tempFile, 'w') as f:
+            f.write(code)
+        
+        os.system(f'{pythonpath} {tempFile}')
+
+        while True:
+            os.remove(tempFile)
+            if not os.path.exists(tempFile):
+                break
